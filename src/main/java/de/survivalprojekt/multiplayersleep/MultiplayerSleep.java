@@ -15,14 +15,11 @@ import org.bukkit.event.player.PlayerBedEnterEvent.BedEnterResult;
 import io.papermc.paper.threadedregions.scheduler.GlobalRegionScheduler;
 
 import java.io.File;
-import java.util.List;
 
 public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExecutor {
 
     private String sleepMessage;
     private String nightSkipMessage;
-    private String playersNeededMessage;
-    private int requiredPlayers;
 
     @Override
     public void onEnable() {
@@ -54,14 +51,6 @@ public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExe
     private void loadConfigValues() {
         sleepMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.sleep", "&e{player} is trying to sleep..."));
         nightSkipMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.night_skip", "&e{player} has skipped the night!"));
-        playersNeededMessage = ChatColor.translateAlternateColorCodes('&', getConfig().getString("messages.players_needed", "&c{needed} more player(s) need to sleep to skip the night!"));
-        requiredPlayers = getConfig().getInt("required_players", 1); // Anzahl der Spieler, die schlafen müssen
-
-        // Debug-Nachrichten
-        getLogger().info("Config reloaded:");
-        getLogger().info("Required players to skip night: " + requiredPlayers);
-        getLogger().info("Sleep message: " + sleepMessage);
-        getLogger().info("Night skip message: " + nightSkipMessage);
     }
 
     // Event wenn Spieler ins Bett geht
@@ -71,16 +60,13 @@ public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExe
             Player player = event.getPlayer();
             World world = player.getWorld();
 
-            int sleepingPlayers = getSleepingPlayers(world);
-
-            if (sleepingPlayers >= requiredPlayers) {
-                skipNight(player, world);
-            } else {
-                int neededPlayers = requiredPlayers - sleepingPlayers;
-                if (neededPlayers > 0) {
-                    Bukkit.broadcastMessage(playersNeededMessage.replace("{needed}", String.valueOf(neededPlayers)));
+            // Vanilla Verhalten: Spieler muss schlafen, um die Nacht zu überspringen
+            GlobalRegionScheduler globalScheduler = Bukkit.getGlobalRegionScheduler();
+            globalScheduler.runDelayed(this, task -> {
+                if (player.isSleeping()) {
+                    skipNight(player, world);
                 }
-            }
+            }, 100L); // Verzögerung, um sicherzustellen, dass der Spieler tatsächlich schläft
         }
     }
 
@@ -91,21 +77,12 @@ public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExe
             long time = world.getTime();
             if (time >= 12541 && time <= 23458) {
                 world.setTime(0);  // Ändere die Zeit global
+                world.setStorm(false);  // Setze das Wetter zurück
+                world.setThundering(false);  // Verhindere Gewitter
+                world.setWeatherDuration(0);  // Setze die Wetterdauer zurück
                 Bukkit.broadcastMessage(nightSkipMessage.replace("{player}", player.getName()));
             }
         });
-    }
-
-    // Zählt die Anzahl der Spieler, die schlafen
-    private int getSleepingPlayers(World world) {
-        List<Player> players = world.getPlayers();
-        int sleepingPlayers = 0;
-        for (Player player : players) {
-            if (player.isSleeping()) {
-                sleepingPlayers++;
-            }
-        }
-        return sleepingPlayers;
     }
 
     // CommandExecutor für /multiplayersleep reload
@@ -131,6 +108,3 @@ public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExe
         return false;
     }
 }
-
-
-
