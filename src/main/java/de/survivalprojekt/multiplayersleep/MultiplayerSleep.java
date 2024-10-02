@@ -32,7 +32,7 @@ public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExe
         loadConfigValues(); // Lade die Werte aus der Konfigurationsdatei
         getLogger().info("MultiplayerSleep enabled!");
     }
-//Das ist ein GitHub selbst Test
+
     @Override
     public void onDisable() {
         getLogger().info("MultiplayerSleep disabled!");
