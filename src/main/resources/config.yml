@@ -2,4 +2,5 @@ messages:
   sleep: "&e{player} is trying to sleep..."
   night_skip: "&e{player} has skipped the night!"
   players_needed: "&c{needed} more player(s) need to sleep to skip the night!"
-required_players: 2
+required_players: 2 #Geht noch nicht richtig hat fehler.
+
