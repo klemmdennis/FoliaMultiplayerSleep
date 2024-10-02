@@ -30,7 +30,7 @@ public class MultiplayerSleep extends JavaPlugin implements Listener, CommandExe
         this.getCommand("multiplayersleep").setExecutor(this);
         createConfig(); // Erstelle die Konfigurationsdatei
         loadConfigValues(); // Lade die Werte aus der Konfigurationsdatei
-        getLogger().info("MultiplayerSleep with Folia support enabled!");
+        getLogger().info("MultiplayerSleep enabled!");
     }
 
     @Override
