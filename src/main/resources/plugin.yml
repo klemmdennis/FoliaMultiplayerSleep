@@ -1,0 +1,9 @@
+name: MultiplayerSleep
+main: de.survivalprojekt.multiplayersleep.MultiplayerSleep
+version: 1.0
+api-version: 1.20
+folia-supported: true
+commands:
+  multiplayersleep:
+    description: Reloads the configuration
+    usage: /<command> reload
